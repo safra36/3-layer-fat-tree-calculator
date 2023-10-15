@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="module" src="./script.js"></script>
+
+    <style>
+
+        body {
+            background-color: rgb(219, 219, 219);
+        }
+
+        .flex {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+
+        .container {
+            height: auto;
+            width: auto;
+        }
+
+        .core {
+
+            height: 4rem;
+            width: 4rem;
+            background-color: rgb(80, 80, 80);
+            border-radius: 4rem;
+            margin-left: 1rem;
+            margin-top: 6rem;
+
+        }
+
+        .pod {
+
+            flex-basis: 30%;
+            width: auto;
+            background-color: rgb(63, 63, 63);
+            margin-left: 1rem;
+            margin-top: 6rem;
+            height: auto;
+            padding: 1rem 1rem 1rem 1rem;
+
+        }
+
+
+        .physical {
+
+            flex-basis: 30%;
+            width: auto;
+            background-color: rgb(63, 63, 63);
+            margin-left: 1rem;
+            margin-top: 2rem;
+            height: auto;
+            padding: 1rem 1rem 1rem 1rem;
+
+        }
+
+
+        .edge {
+
+            height: 2rem;
+            width: 15%;
+            background-color: rgb(133, 133, 133);
+            margin-right: 1rem;
+
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="flex" id="core-container">
+        <div class="core"></div>
+        <div class="core"></div>
+        <div class="core"></div>
+        <div class="core"></div>
+        <div class="core"></div>
+    </div>
+
+    <div class="flex">
+        <div class="pod">
+
+            <dir class="container flex">
+                <div class="edge"></div>
+                <div class="edge"></div>
+            </dir>
+
+            <dir class="container flex">
+                <div class="edge"></div>
+                <div class="edge"></div>
+            </dir>
+            
+
+        </div>
+        <div class="pod">
+
+            <dir class="container flex">
+                <div class="edge"></div>
+                <div class="edge"></div>
+            </dir>
+
+            <dir class="container flex">
+                <div class="edge"></div>
+                <div class="edge"></div>
+            </dir>
+
+        </div>
+        
+        <div class="pod">
+            
+            <dir class="container flex">
+                <div class="edge"></div>
+                <div class="edge"></div>
+            </dir>
+
+            <dir class="container flex">
+                <div class="edge"></div>
+                <div class="edge"></div>
+            </dir>
+
+        </div>
+    </div>
+
+    <div class="flex">
+
+        <div class="physical">
+
+            <dir class="container flex">
+                <div class="edge"></div>
+                <div class="edge"></div>
+            </dir>
+
+        </div>
+
+        <div class="physical">
+
+            <dir class="container flex">
+                <div class="edge"></div>
+                <div class="edge"></div>
+            </dir>
+
+        </div>
+
+        <div class="physical">
+
+            <dir class="container flex">
+                <div class="edge"></div>
+                <div class="edge"></div>
+            </dir>
+
+        </div>
+
+    </div>
+    
+</body>
+</html>

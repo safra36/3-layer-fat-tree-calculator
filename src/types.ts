@@ -17,6 +17,22 @@ export interface Pod {
 
 }
 
+export interface Link {
+
+    startAt : number,
+    entAt : number
+
+}
+
+
+export interface SwitchPath {
+
+    startId : number,
+    endId : number
+    paths : number[][]
+
+}
+
 
 export interface Switch {
 
@@ -53,6 +69,120 @@ export type kInput = 4 | 8 | 16 | 32 | 64 | 128 | 256 | 512
 
 
 export class Utils {
+
+
+    static getAllPossiblePaths(
+        startServer : Switch,
+        endServer : Switch,
+        _switches : Switch[],
+        k : kInput
+    ) {
+
+        const switches = JSON.parse(JSON.stringify(_switches)) as Switch[]
+
+        let pathList = []
+        let lastIndex = 0;
+
+        while(lastIndex != ((+k/2))) {
+            
+
+            let visited_1 = [startServer.switchId];
+            let visited_2 = [endServer.switchId];
+            
+            while(true) {
+                
+                const currentServer = switches.find(swtichObject => swtichObject.switchId == visited_1[visited_1.length-1]) as Switch;
+                // currentServer.connections_up.map(connection => visited_1.push(connection));
+
+                if(currentServer.connections_up.length > 1) {
+                    visited_1.push(currentServer.connections_up[lastIndex] as number)
+                } else {
+                    visited_1.push(currentServer.connections_up[0] as number)
+                }
+
+                
+            
+                const targetServer = switches.find(swtichObject => swtichObject.switchId == visited_2[visited_2.length-1]) as Switch;
+                // targetServer.connections_up.map(connection => visited_2.push(connection));
+                if(targetServer.connections_up.length > 1) {
+                    visited_2.push(targetServer.connections_up[lastIndex] as number)
+                } else {
+                    visited_2.push(targetServer.connections_up[0] as number)
+                }
+            
+                const similarity = Utils.getSimilarity(visited_1, visited_2);
+                if(similarity.length > 0) {
+                    break;
+                }
+            
+            
+            }
+
+            pathList.push(Utils.mergePath(visited_1, visited_2))
+
+            lastIndex++;
+
+        }
+
+        return pathList;
+
+    }
+
+
+    static getShortestPath(
+        startServer : Switch,
+        endServer : Switch,
+        _switches : Switch[]
+    ) {
+
+        const switches = JSON.parse(JSON.stringify(_switches)) as Switch[]
+
+        let visited_1 = [startServer.switchId];
+        let visited_2 = [endServer.switchId];
+
+        while(true) {
+            
+            const currentServer = switches.find(swtichObject => swtichObject.switchId == visited_1[visited_1.length-1]) as Switch;
+            // currentServer.connections_up.map(connection => visited_1.push(connection));
+            visited_1.push(currentServer.connections_up.shift() as number)
+
+            const targetServer = switches.find(swtichObject => swtichObject.switchId == visited_2[visited_2.length-1]) as Switch;
+            // targetServer.connections_up.map(connection => visited_2.push(connection));
+            visited_2.push(targetServer.connections_up.shift() as number)
+
+            const similarity = Utils.getSimilarity(visited_1, visited_2);
+            if(similarity.length > 0) {
+                console.log(similarity);
+                
+                break;
+            }
+
+
+        }
+
+        // console.log(visited_1, visited_2, Utils.mergePath(visited_1, visited_2));
+        return Utils.mergePath(visited_1, visited_2);
+
+    }
+
+
+    static getSimilarity(
+        array1 : any[],
+        array2 : any[]
+    ) {
+
+        return array1.filter(arrayItem => array2.find(arrayItem2 => arrayItem == arrayItem2));
+
+    }
+
+    static mergePath(
+        array1 : number[],
+        array2 : number[]
+    ) {
+
+        return Array.from(new Set([...array1, ...array2.reverse()]))
+
+    }
 
 
     static getCoreSwitchCount(k : kInput) : number {

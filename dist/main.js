@@ -79,18 +79,151 @@ function ccm(map) {
     return _map;
 }
 exports.ccm = ccm;
-let d = Date.now();
-const map = csm(8);
+function printConnections(switches) {
+    for (const switchObject of switches) {
+        for (const connection of [...switchObject.connections_up]) {
+            console.log(switchObject.switchId, connection, 1);
+        }
+        for (const connection of [...switchObject.connections_down]) {
+            console.log(switchObject.switchId, connection, 1);
+        }
+    }
+}
+// store links with direction to travers and find a path
+function generateLinks(switches) {
+    let links = [];
+    for (const switchObject of switches) {
+        for (const connection of [...switchObject.connections_up]) {
+            links.push({
+                entAt: connection,
+                startAt: switchObject.switchId
+            });
+            console.log(switchObject.switchId, connection, 1);
+        }
+        for (const connection of [...switchObject.connections_down]) {
+            links.push({
+                entAt: connection,
+                startAt: switchObject.switchId
+            });
+            console.log(switchObject.switchId, connection, 1);
+        }
+    }
+    return links;
+}
+const k = 4;
+const map = csm(k);
 const cons = ccm(map);
-console.log("TOOK", Date.now() - d);
 const switches = [
     ...cons.aggregation,
     ...cons.core,
     ...cons.edge,
     ...cons.physical
 ];
-for (const switchObject of switches) {
-    for (const connection of [...switchObject.connections_up]) {
-        console.log(switchObject.switchId, connection, 1);
+// console.log(switches);
+printConnections(switches);
+const links = generateLinks(switches);
+// console.log(links);
+const startServer = cons.physical[0];
+const endServer = cons.physical[4];
+/* console.log(Utils.getShortestPath(cons.physical[0], cons.physical[4], switches));
+console.log(Utils.getShortestPath(cons.physical[0], cons.physical[6], switches)); */
+let shits = [];
+let lastIndex = 0;
+while (lastIndex != ((+k / 2))) {
+    console.log(lastIndex, ((+k / 2)) - 1);
+    let visited_1 = [startServer.switchId];
+    let visited_2 = [endServer.switchId];
+    while (true) {
+        const currentServer = switches.find(swtichObject => swtichObject.switchId == visited_1[visited_1.length - 1]);
+        // currentServer.connections_up.map(connection => visited_1.push(connection));
+        if (currentServer.connections_up.length > 1) {
+            visited_1.push(currentServer.connections_up[lastIndex]);
+        }
+        else {
+            visited_1.push(currentServer.connections_up[0]);
+        }
+        const targetServer = switches.find(swtichObject => swtichObject.switchId == visited_2[visited_2.length - 1]);
+        // targetServer.connections_up.map(connection => visited_2.push(connection));
+        if (targetServer.connections_up.length > 1) {
+            visited_2.push(targetServer.connections_up[lastIndex]);
+        }
+        else {
+            visited_2.push(targetServer.connections_up[0]);
+        }
+        const similarity = types_1.Utils.getSimilarity(visited_1, visited_2);
+        if (similarity.length > 0) {
+            break;
+        }
     }
+    shits.push(types_1.Utils.mergePath(visited_1, visited_2));
+    lastIndex++;
 }
+console.log(shits);
+// for(const)
+/* for(const server of cons.physical) {
+
+    let otherServers = JSON.parse(JSON.stringify(cons.physical)) as Switch[]
+    otherServers.splice(otherServers.indexOf(server));
+
+    let visitedPath = new Set<number>();
+
+    for(const otherServer of otherServers) {
+
+
+    }
+    
+
+} */
+/* let paths : SwitchPath[] = []
+
+for(const server of cons.physical) {
+
+    let linkCopy = JSON.parse(JSON.stringify(links)) as Link[];
+
+    let path : SwitchPath = {
+        startId : server.switchId,
+        endId : -1,
+        paths : []
+    }
+
+    let startingLinkIndex = linkCopy.findIndex(linkObject => linkObject.startAt == server.switchId);
+    let startingLink = linkCopy[startingLinkIndex];
+
+    let otherServers = JSON.parse(JSON.stringify(cons.physical)) as Switch[]
+    otherServers.splice(otherServers.indexOf(server));
+
+
+    for(const targetServer of otherServers) {
+
+        console.log(server, targetServer);
+        
+        if(path.endId == -1) path.endId = targetServer.switchId;
+        let traversingPath = [startingLink.startAt];
+
+        console.log(startingLink);
+        
+        while(startingLink.entAt != targetServer.switchId) {
+
+            traversingPath.push(startingLink.entAt);
+            linkCopy.splice(startingLinkIndex, 1);
+            startingLinkIndex = linkCopy.findIndex(linkObject => linkObject.startAt == startingLink.entAt);
+            startingLink = linkCopy[startingLinkIndex];
+
+            console.log("LEN", linkCopy.length, startingLinkIndex);
+            
+            
+
+        }
+
+        
+        path.paths.push(traversingPath);
+
+        console.log("PATH", path);
+
+    }
+
+    console.log(path);
+    break;
+    
+
+} */

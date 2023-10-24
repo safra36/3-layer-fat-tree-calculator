@@ -128,24 +128,49 @@ const endServer = cons.physical[4];
 /* console.log(Utils.getShortestPath(cons.physical[0], cons.physical[4], switches));
 console.log(Utils.getShortestPath(cons.physical[0], cons.physical[6], switches)); */
 let shits = [];
+// create a last index of
 let lastIndex = 0;
-while (lastIndex != ((+k / 2))) {
-    console.log(lastIndex, ((+k / 2)) - 1);
+let aggregationIndex = 0;
+let edgeIndex = 0;
+let coreIndex = 0;
+while (true) {
+    // console.log(lastIndex, ((+k/2)) - 1);
+    console.log("Sam", coreIndex, aggregationIndex, edgeIndex);
     let visited_1 = [startServer.switchId];
     let visited_2 = [endServer.switchId];
     while (true) {
+        console.log("Sam 2", coreIndex, aggregationIndex, edgeIndex);
         const currentServer = switches.find(swtichObject => swtichObject.switchId == visited_1[visited_1.length - 1]);
         // currentServer.connections_up.map(connection => visited_1.push(connection));
         if (currentServer.connections_up.length > 1) {
-            visited_1.push(currentServer.connections_up[lastIndex]);
+            // console.log("Khier", currentServer.type, visited_1);
+            if (currentServer.type == types_1.SwitchType.Aggregation) {
+                visited_1.push(currentServer.connections_up[aggregationIndex]);
+            }
+            else if (currentServer.type == types_1.SwitchType.Core) {
+                visited_1.push(currentServer.connections_up[coreIndex]);
+            }
+            else if (currentServer.type == types_1.SwitchType.Edge) {
+                visited_1.push(currentServer.connections_up[edgeIndex]);
+            }
         }
         else {
+            console.log("goes", currentServer.type);
             visited_1.push(currentServer.connections_up[0]);
         }
         const targetServer = switches.find(swtichObject => swtichObject.switchId == visited_2[visited_2.length - 1]);
         // targetServer.connections_up.map(connection => visited_2.push(connection));
         if (targetServer.connections_up.length > 1) {
-            visited_2.push(targetServer.connections_up[lastIndex]);
+            // visited_2.push(targetServer.connections_up[lastIndex] as number)
+            if (targetServer.type == types_1.SwitchType.Aggregation) {
+                visited_1.push(targetServer.connections_up[aggregationIndex]);
+            }
+            else if (targetServer.type == types_1.SwitchType.Core) {
+                visited_1.push(targetServer.connections_up[coreIndex]);
+            }
+            else if (targetServer.type == types_1.SwitchType.Edge) {
+                visited_1.push(targetServer.connections_up[edgeIndex]);
+            }
         }
         else {
             visited_2.push(targetServer.connections_up[0]);
@@ -154,9 +179,23 @@ while (lastIndex != ((+k / 2))) {
         if (similarity.length > 0) {
             break;
         }
+        coreIndex++;
+        if (coreIndex == ((+k / 2)))
+            break;
     }
+    console.log("Doh");
     shits.push(types_1.Utils.mergePath(visited_1, visited_2));
-    lastIndex++;
+    if (coreIndex != ((+k / 2))) {
+        coreIndex = 0;
+        aggregationIndex = +aggregationIndex + 1;
+    }
+    if (aggregationIndex != ((+k / 2))) {
+        aggregationIndex = 0;
+        edgeIndex = +edgeIndex + 1;
+    }
+    if (edgeIndex == ((+k / 2)))
+        break;
+    console.log(coreIndex, aggregationIndex, edgeIndex);
 }
 console.log(shits);
 // for(const)

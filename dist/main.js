@@ -110,6 +110,26 @@ function generateLinks(switches) {
     }
     return links;
 }
+function generateGraph(k, start, end) {
+    const startServer = cons.physical[start];
+    const endServer = cons.physical[end];
+    let routes = [];
+    const halfK = (+k / 2);
+    for (let x = 0; x < halfK; x++) {
+        const edgeSwitch = switches.find(switchObject => switchObject.switchId == startServer.connections_up[0]);
+        const aggregationSwitch = switches.find(switchObject => switchObject.switchId == edgeSwitch.connections_up[x]);
+        for (let j = 0; j < halfK; j++) {
+            const coreSwtich = switches.find(switchObject => switchObject.switchId == aggregationSwitch.connections_up[j]);
+            const endServerPod = switches.find(switchObject => switchObject.switchId == endServer.connections_up[0]).pod;
+            const nextAggregationSwitch = switches.filter(switchObject => switchObject.pod == endServerPod && switchObject.connections_up.includes(coreSwtich.switchId))[0];
+            const nextEdgeSwitch = endServer.connections_up[0];
+            let route = [startServer.switchId, startServer.connections_up[0]];
+            route.push(aggregationSwitch.switchId, coreSwtich.switchId, nextAggregationSwitch.switchId, nextEdgeSwitch, endServer.switchId);
+            routes.push(route);
+        }
+    }
+    return routes;
+}
 const k = 4;
 const map = csm(k);
 const cons = ccm(map);
@@ -121,83 +141,138 @@ const switches = [
 ];
 // console.log(switches);
 printConnections(switches);
-const links = generateLinks(switches);
+const graph = generateGraph(k, 0, 8);
+console.log(graph);
 // console.log(links);
-const startServer = cons.physical[0];
-const endServer = cons.physical[4];
-/* console.log(Utils.getShortestPath(cons.physical[0], cons.physical[4], switches));
-console.log(Utils.getShortestPath(cons.physical[0], cons.physical[6], switches)); */
-let shits = [];
+/* const startServer = cons.physical[0]
+const endServer = cons.physical[1]
+
+
+let routes = [];
+const halfK = (+k/2);
+
+for(let x = 0 ; x< halfK ; x++) {
+
+    const edgeSwitch = switches.find(switchObject => switchObject.switchId == startServer.connections_up[0]) as Switch;
+    const aggregationSwitch = switches.find(switchObject => switchObject.switchId == edgeSwitch.connections_up[x]) as Switch;
+
+
+    for(let j=0;j<halfK;j++) {
+        
+
+        const coreSwtich = switches.find(switchObject => switchObject.switchId == aggregationSwitch.connections_up[j]) as Switch;
+        const endServerPod = (switches.find(switchObject => switchObject.switchId == endServer.connections_up[0]) as Switch).pod as number;
+
+        const nextAggregationSwitch = switches.filter(switchObject => switchObject.pod == endServerPod && switchObject.connections_up.includes(coreSwtich.switchId))[0]
+        const nextEdgeSwitch = endServer.connections_up[0];
+
+        // console.log(nextTheNextServer, DatNextServer, endServerPod, edgeSwitch.switchId, aggregationSwitch.switchId, route);
+        
+
+        let route = [startServer.switchId, startServer.connections_up[0]];
+        route.push(aggregationSwitch.switchId, coreSwtich.switchId, nextAggregationSwitch.switchId, nextEdgeSwitch, endServer.switchId)
+        routes.push(route)
+
+    }
+
+}
+
+console.log(routes); */
+/* let shits = []
 // create a last index of
 let lastIndex = 0;
 let aggregationIndex = 0;
 let edgeIndex = 0;
 let coreIndex = 0;
-while (true) {
+
+while(true) {
+
     // console.log(lastIndex, ((+k/2)) - 1);
     console.log("Sam", coreIndex, aggregationIndex, edgeIndex);
+
     let visited_1 = [startServer.switchId];
     let visited_2 = [endServer.switchId];
-    while (true) {
+    
+    while(true) {
+
         console.log("Sam 2", coreIndex, aggregationIndex, edgeIndex);
-        const currentServer = switches.find(swtichObject => swtichObject.switchId == visited_1[visited_1.length - 1]);
+        
+        const currentServer = switches.find(swtichObject => swtichObject.switchId == visited_1[visited_1.length-1]) as Switch;
         // currentServer.connections_up.map(connection => visited_1.push(connection));
-        if (currentServer.connections_up.length > 1) {
+
+        if(currentServer.connections_up.length > 1) {
             // console.log("Khier", currentServer.type, visited_1);
-            if (currentServer.type == types_1.SwitchType.Aggregation) {
-                visited_1.push(currentServer.connections_up[aggregationIndex]);
+            
+            if(currentServer.type == SwitchType.Aggregation) {
+                visited_1.push(currentServer.connections_up[aggregationIndex] as number)
+            } else if(currentServer.type == SwitchType.Core) {
+                visited_1.push(currentServer.connections_up[coreIndex] as number)
+            } else if(currentServer.type == SwitchType.Edge) {
+                visited_1.push(currentServer.connections_up[edgeIndex] as number)
             }
-            else if (currentServer.type == types_1.SwitchType.Core) {
-                visited_1.push(currentServer.connections_up[coreIndex]);
-            }
-            else if (currentServer.type == types_1.SwitchType.Edge) {
-                visited_1.push(currentServer.connections_up[edgeIndex]);
-            }
-        }
-        else {
+
+        } else {
             console.log("goes", currentServer.type);
-            visited_1.push(currentServer.connections_up[0]);
+            visited_1.push(currentServer.connections_up[0] as number)
         }
-        const targetServer = switches.find(swtichObject => swtichObject.switchId == visited_2[visited_2.length - 1]);
+
+        
+    
+        const targetServer = switches.find(swtichObject => swtichObject.switchId == visited_2[visited_2.length-1]) as Switch;
         // targetServer.connections_up.map(connection => visited_2.push(connection));
-        if (targetServer.connections_up.length > 1) {
+        if(targetServer.connections_up.length > 1) {
             // visited_2.push(targetServer.connections_up[lastIndex] as number)
-            if (targetServer.type == types_1.SwitchType.Aggregation) {
-                visited_1.push(targetServer.connections_up[aggregationIndex]);
+
+            if(targetServer.type == SwitchType.Aggregation) {
+                visited_1.push(targetServer.connections_up[aggregationIndex] as number)
+            } else if(targetServer.type == SwitchType.Core) {
+                visited_1.push(targetServer.connections_up[coreIndex] as number)
+            } else if(targetServer.type == SwitchType.Edge) {
+                visited_1.push(targetServer.connections_up[edgeIndex] as number)
             }
-            else if (targetServer.type == types_1.SwitchType.Core) {
-                visited_1.push(targetServer.connections_up[coreIndex]);
-            }
-            else if (targetServer.type == types_1.SwitchType.Edge) {
-                visited_1.push(targetServer.connections_up[edgeIndex]);
-            }
+
+        } else {
+            visited_2.push(targetServer.connections_up[0] as number)
         }
-        else {
-            visited_2.push(targetServer.connections_up[0]);
-        }
-        const similarity = types_1.Utils.getSimilarity(visited_1, visited_2);
-        if (similarity.length > 0) {
+    
+        const similarity = Utils.getSimilarity(visited_1, visited_2);
+        if(similarity.length > 0) {
             break;
         }
+
         coreIndex++;
-        if (coreIndex == ((+k / 2)))
-            break;
+
+        if(coreIndex == ((+k/2))) break;
+    
+    
     }
+
     console.log("Doh");
-    shits.push(types_1.Utils.mergePath(visited_1, visited_2));
-    if (coreIndex != ((+k / 2))) {
+    
+
+    shits.push(Utils.mergePath(visited_1, visited_2))
+
+    
+
+    if(coreIndex != ((+k/2))) {
         coreIndex = 0;
         aggregationIndex = +aggregationIndex + 1;
     }
-    if (aggregationIndex != ((+k / 2))) {
+
+    if(aggregationIndex != ((+k/2))) {
         aggregationIndex = 0;
         edgeIndex = +edgeIndex + 1;
     }
-    if (edgeIndex == ((+k / 2)))
-        break;
+
+    if(edgeIndex ==((+k/2))) break;
+
     console.log(coreIndex, aggregationIndex, edgeIndex);
+    
+    
+
 }
-console.log(shits);
+
+console.log(shits); */
 // for(const)
 /* for(const server of cons.physical) {
 

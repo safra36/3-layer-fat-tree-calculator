@@ -193,6 +193,42 @@ function generateLinks( switches :  Switch[] ) : Link[] {
 
 }
 
+function generateGraph(k : kInput, start : number, end : number) {
+
+    const startServer = cons.physical[start]
+    const endServer = cons.physical[end]
+
+    let routes = [];
+    const halfK = (+k/2);
+
+    for(let x = 0 ; x< halfK ; x++) {
+
+        const edgeSwitch = switches.find(switchObject => switchObject.switchId == startServer.connections_up[0]) as Switch;
+        const aggregationSwitch = switches.find(switchObject => switchObject.switchId == edgeSwitch.connections_up[x]) as Switch;
+
+
+        for(let j=0;j<halfK;j++) {
+            
+
+            const coreSwtich = switches.find(switchObject => switchObject.switchId == aggregationSwitch.connections_up[j]) as Switch;
+            const endServerPod = (switches.find(switchObject => switchObject.switchId == endServer.connections_up[0]) as Switch).pod as number;
+
+            const nextAggregationSwitch = switches.filter(switchObject => switchObject.pod == endServerPod && switchObject.connections_up.includes(coreSwtich.switchId))[0]
+            const nextEdgeSwitch = endServer.connections_up[0];
+
+
+            let route = [startServer.switchId, startServer.connections_up[0]];
+            route.push(aggregationSwitch.switchId, coreSwtich.switchId, nextAggregationSwitch.switchId, nextEdgeSwitch, endServer.switchId)
+            routes.push(route)
+
+        }
+
+    }
+
+    return routes;
+
+}
+
 const k = 4;
 const map = csm(k);
 const cons = ccm(map);
@@ -208,18 +244,58 @@ const switches = [
 
 
 printConnections(switches);
-const links = generateLinks(switches);
+const graph = generateGraph(k, 0, 8);
+
+console.log(graph);
+
+
 
 
 // console.log(links);
 
-const startServer = cons.physical[0]
-const endServer = cons.physical[4]
+/* const startServer = cons.physical[0]
+const endServer = cons.physical[1]
 
-/* console.log(Utils.getShortestPath(cons.physical[0], cons.physical[4], switches));
-console.log(Utils.getShortestPath(cons.physical[0], cons.physical[6], switches)); */
 
-let shits = []
+let routes = [];
+const halfK = (+k/2);
+
+for(let x = 0 ; x< halfK ; x++) {
+
+    const edgeSwitch = switches.find(switchObject => switchObject.switchId == startServer.connections_up[0]) as Switch;
+    const aggregationSwitch = switches.find(switchObject => switchObject.switchId == edgeSwitch.connections_up[x]) as Switch;
+
+
+    for(let j=0;j<halfK;j++) {
+        
+
+        const coreSwtich = switches.find(switchObject => switchObject.switchId == aggregationSwitch.connections_up[j]) as Switch;
+        const endServerPod = (switches.find(switchObject => switchObject.switchId == endServer.connections_up[0]) as Switch).pod as number;
+
+        const nextAggregationSwitch = switches.filter(switchObject => switchObject.pod == endServerPod && switchObject.connections_up.includes(coreSwtich.switchId))[0]
+        const nextEdgeSwitch = endServer.connections_up[0];
+
+        // console.log(nextTheNextServer, DatNextServer, endServerPod, edgeSwitch.switchId, aggregationSwitch.switchId, route);
+        
+
+        let route = [startServer.switchId, startServer.connections_up[0]];
+        route.push(aggregationSwitch.switchId, coreSwtich.switchId, nextAggregationSwitch.switchId, nextEdgeSwitch, endServer.switchId)
+        routes.push(route)
+
+    }
+
+}
+
+console.log(routes); */
+
+
+
+
+
+
+
+
+/* let shits = []
 // create a last index of
 let lastIndex = 0;
 let aggregationIndex = 0;
@@ -313,7 +389,7 @@ while(true) {
 
 }
 
-console.log(shits);
+console.log(shits); */
 
 
 

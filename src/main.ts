@@ -229,7 +229,8 @@ function generateGraph(k : kInput, start : number, end : number) {
 
 }
 
-const k = 8;
+
+const k = 128;
 const map = csm(k);
 const cons = ccm(map);
 
@@ -243,24 +244,20 @@ const switches = [
 // console.log(switches);
 
 
-printConnections(switches);
-const graphs = generateGraph(k, 0, 8);
+// printConnections(switches);
 
-let total = ""
+
+const graphs = generateGraph(k, 0, 128);
 for(const graphArray of graphs) {
 
-    let txt = ""
-    for(const graphText of graphArray) {
+    console.log("\n");
 
-        txt += `--> ${graphText} `
-
+    for(let x = 1;x<graphArray.length;x++) {
+        console.log(graphArray[x-1], graphArray[x], 1);
     }
-
-    total += `${txt}\n`
 
 }
 
-console.log(total);
 
 
 

@@ -130,7 +130,7 @@ function generateGraph(k, start, end) {
     }
     return routes;
 }
-const k = 8;
+const k = 128;
 const map = csm(k);
 const cons = ccm(map);
 const switches = [
@@ -140,17 +140,14 @@ const switches = [
     ...cons.physical
 ];
 // console.log(switches);
-printConnections(switches);
-const graphs = generateGraph(k, 0, 8);
-let total = "";
+// printConnections(switches);
+const graphs = generateGraph(k, 0, 128);
 for (const graphArray of graphs) {
-    let txt = "";
-    for (const graphText of graphArray) {
-        txt += `--> ${graphText} `;
+    console.log("\n");
+    for (let x = 1; x < graphArray.length; x++) {
+        console.log(graphArray[x - 1], graphArray[x], 1);
     }
-    total += `${txt}\n`;
 }
-console.log(total);
 // console.log(links);
 /* const startServer = cons.physical[0]
 const endServer = cons.physical[1]
